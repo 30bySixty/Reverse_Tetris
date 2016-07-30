@@ -1,0 +1,44 @@
+.tetrislist {
+    display: inline-block;
+    min-width: 65px;
+    margin: 20px 10px;
+}
+.pieceA div, .pieceB div div, .pieceC div div, .pieceD div div, .pieceE div, .board div div{
+    width: 20px;
+    height: 20px;
+}
+.pieceA div, .board div div.A{ 
+    background-color: greenyellow;
+    border: 1px solid green;
+}
+.pieceB div div, .board div div.B{
+    background-color: darkturquoise;
+    border: 1px solid blue;
+}
+.pieceC div div, .board div div.C {
+    background-color: lightcoral;
+    border: 1px solid darkred;
+}
+.pieceD div div, .board div div.D {
+    background-color: orange;
+    border: 1px solid orangered;
+}
+.pieceE div div, .board div div.E {
+    background-color: gold;
+    border: 1px solid goldenrod;
+}
+.board div div{
+    background-color: lightgray;
+    border: 1px solid lightslategray;
+}
+.pieceB > div, .pieceC > div, .pieceD > div, .pieceE > div, .board > div {
+    min-width: 100%;
+    height: 20px;
+}
+.pieceB div div, .pieceC div div, .pieceD div div, .pieceE div div, .board div div {
+    float: left;
+}
+.clear {
+    background-color: transparent !important;
+    border: none !important;
+}
