@@ -28,11 +28,11 @@ function orderrows() {
 //END SETUP OF GAME BOARD & SCORING
 
 //BEGIN LOGIC FOR PLACING BLOCKS
+//DETERMINE PIECE LOGIC BASED ON COLUMN OFFSET OF BLOCK COMPONENTS VS INITIAL BLOCK COMPONENT POSITION
 var $pieces = [];
 var blockClass;
 var blocks = [];
 var block;
-//DETERMINE PIECE LOGIC BASED ON COLUMN OFFSET OF BLOCK COMPONENTS VS INITIAL BLOCK COMPONENT POSITION
 function myFunction(piece) {
     $pieces.push(piece);
     var choose = piece.id 
@@ -64,7 +64,7 @@ function myFunction(piece) {
                 } else if (i==1) {
                     pieceLogic(0, 0, 1, 0, 1, 1, 2);
                 } else if (i==2) {
-                    pieceLogic(0, 0, 1, -1, 2);//CHANGED to -1 FROM 1
+                    pieceLogic(0, 0, 1, -1, 2);//CHANGED to -1 FROM 1~~
                 } else {
                     pieceLogic(0, 0, 0, -1, 3, 2, 2);
                 };
@@ -116,7 +116,9 @@ function myFunction(piece) {
             break;
     };
 };
+
 //DETERMINE SCORE OF ROTATED PIECES BASED ON HOW MANY EDGES ARE TOUCHING SOMETHING ELSE
+var solutions = [];
 function pieceLogic(A, B, C, D, E, F, G) {//E for rotation, F-G for unique cases
     var i = 0;
     var j = 0;
@@ -174,12 +176,11 @@ function pieceLogic(A, B, C, D, E, F, G) {//E for rotation, F-G for unique cases
                                     };
                                 };
                             };
-                            //THINK THIS SHOULD BE CHECKRIGHT
                         }
                     };
                     if (checkpos.length == 4) {
                         score += rows[j];
-                        initialpositions.push([rows[j] , Math.round($(this).attr('id')), score, E]);
+                        initialpositions.push([rows[j],  Math.round($(this).attr('id')), score, E]);
                     };
                 };
             };
@@ -202,7 +203,7 @@ function pieceLogic(A, B, C, D, E, F, G) {//E for rotation, F-G for unique cases
             };
         }; 
     };
-    //BEGIN: figuring out solution initial position
+    //prep to run chooseSolution()
     for (i=0; i<initialpositions.length; i++) {
         indices.push(initialpositions[i][2]);
     };
@@ -212,21 +213,19 @@ function pieceLogic(A, B, C, D, E, F, G) {//E for rotation, F-G for unique cases
         };
     };
 }; 
-var rows = [];
+
 //FIND HIGHEST ROW# THAT DOES NOT CONTAIN DIVs WITH CLASSES
+var rows = [];
 function findrows() {
     var i;
     var divs = [];
-//    console.log("running1");
     for (i=0; i<height; i++) {
         $('.board').children("#"+i).children().each(function() {
             if ($(this).hasClass("1")) {
-//                console.log("runnig");
                 divs.push("true");
             };
         });
         if (divs.length>0) {
-//            console.log("running2");
             rows.push(i);
             rows.push(i-1);
         } else {
@@ -236,14 +235,15 @@ function findrows() {
     rows = $.unique(rows);
     return rows;
 };
+
+//ADD TO SCORE OF VARIOUS INITIAL POSITIONS WHEN BLOCK COMPONENT EDGES TOUCH SOMETHING ELSE
 var score;
 function checkBottom(X, Y) {
-    //if next row is bottom, add 1
-    //else check if div in that position in next row has class "1", if so add 1
+    //~~~THINK HERE CAN IMPROVE ALGO BY ADDING LOOP TO CHECK ALL OTHER ROWS
     if (X > height-1) {
         score += 1;
     } else {
-            if ($('.board').children('#'+X).children('#' +Y).hasClass("1")) {
+        if ($('.board').children('#'+X).children('#' +Y).hasClass("1")) {
             score +=1;
         } else {
             score -=1;
@@ -277,7 +277,7 @@ function checkLeft(X, Y) {
     return score;
 }
 
-var solutions = [];
+//CHOOSE OPTIMAL BLOCK INITIAL POSITION
 function chooseSolution() {
     var indices = [];
     var solutions2 = [];
@@ -291,19 +291,20 @@ function chooseSolution() {
         };
     };
     for (i=0; i<solutions2.length; i++) {
-        console.log(solutions2[i]);
     };
-    //if solutions2 are greater than 1, choose just 1 array
+//    console.log(solutions2);
+    //if solutions2 are greater than 1, choose just 1 array at random
     if (solutions2.length > 1) {
         solutions2 = solutions2[Math.round(Math.random() * (solutions2.length - 1))];
         piecestart(solutions2[0],solutions2[1], solutions2[3]);
     } else {
         piecestart(solutions2[0][0],solutions2[0][1], solutions2[0][3]);
     };
-    console.log(solutions2);
     solutions= [];
 };
+
 //PLACE THE SOLUTION PIECE ON THE BOARD
+var gameOver;
 function piecestart(rowi, columnj, permutation) {
     var i = 0;
     var colOffset = 0;
@@ -311,31 +312,46 @@ function piecestart(rowi, columnj, permutation) {
     var findrow = 0;
     var findcol = 0;  
     var chooseBlock = [];
-    switch (permutation) {
-        case 0:
-            chooseBlock = blocks[0];
-            break;
-        case 1:
-            chooseBlock = blocks[1];
-            break;
-        case 2:
-            chooseBlock = blocks[2];
-            break;
-        case 3:
-            chooseBlock = blocks[3];
-            break;
+    if (!(gameOver > 0)) {
+        switch (permutation) {
+            case 0:
+                chooseBlock = blocks[0];
+                break;
+            case 1:
+                chooseBlock = blocks[1];
+                break;
+            case 2:
+                chooseBlock = blocks[2];
+                break;
+            case 3:
+                chooseBlock = blocks[3];
+                break;
+        };
+       for (i=0; i<4; i++) {
+           colOffset = chooseBlock[i][0];
+           rowOffset = chooseBlock[i][1];
+           findrow = rowi - rowOffset;
+           findcol = columnj + colOffset;
+           $('.board').children('#'+findrow).children('#'+findcol).addClass(blockClass).addClass("1");
+       };
+        setTimeout(function() {clearrow(); }, 250);
+    
+        //CHECK IF GAME OVER
+        var divs = [];
+        $('.board').children("#"+0).children().each(function() {
+            if ($(this).hasClass("1")) {
+                divs.push("true");
+            };
+        });
+        if (divs.length>0) {
+            gameOver = 1;
+            $(".notice3").remove();
+            $("#notes").append('<div class="gameover">Game Over! You Win! Final Score: '+rowScore+'</div>');
+        };
     };
-   for (i=0; i<4; i++) {
-       colOffset = chooseBlock[i][0];
-       rowOffset = chooseBlock[i][1];
-       findrow = rowi - rowOffset;
-       findcol = columnj + colOffset;
-       $('.board').children('#'+findrow).children('#'+findcol).addClass(blockClass).addClass("1");
-   };
-    setTimeout(function() {clearrow(); }, 250);
-    //at the end of this function, run function to check if game is still being played!
-    //or maybe this should be played before the for loop, so that the game can be over and then you can visually see why it's over
 }
+//END LOGIC FOR PLACING BLOCKS
+
 //REMOVE ANY COMPLETE ROWS FROM THE BOARD
 function clearrow() {
     var clearRows = [];
@@ -366,6 +382,7 @@ function clearrow() {
     createboard();
     };
 };
+
 //ADD NUMBER OF CLEARED ROWS TO TOTAL USER SCORE
 function logscore(X) {
     rowScore += X;
@@ -375,29 +392,12 @@ function logscore(X) {
     };
 };
 
-
-//NEXT: run function that checks for complete rows and removes them (DONE)
-//NEXT: add function that changes all id's to numerical order (DONE)
-//NEXT: add jQuery that adds to row id=1 a thick red border on the top (DONE)
-//NEXT: add function that keeps track of how many rows were cleared (DONE)
-//NEXT: make squareLogic general s.t. can be used for lineLogic (DONE)
-//NEXT: add function that runs for both rotations of piece A (DONE)
-//NEXT: add function that pushes all filled rows to bottom (DONE)
-//NEXT: add Piece D (DONE)
-//NEXT: add if statement to check that initial position + minColOffset >= 0 (DONE)
-//NEXT: add function that subtracts from score if placement leaves empty square (DONE)
-//NEXT: change form so that click on piece puts piece on board (DONE)
-//NEXT: add piece E (DONE)
-//NEXT: add piece B (DONE)
-
-
-//NEXT: add function that checks if shape goes over line, flash "game over!"
-//NEXT: add function that subtracts (a lot) from score for going over line
-//NEXT: add function that sees where empty squares are, and subtracts from score for covering those
-
 $(document).ready(createboard);
 $(document).on('page:load', createboard);
-//TO DO: *chomp input (e.g. remove any extra spaces) *downcase input s.t. A & a are ok *add other letters like B, C, and D 
-//TO DO MUCH LATER: have Ruby take end score and push it into database in DynamoDB
+//STEPS TO IMPROVE ALGO FUNCTIONALITY
+//Add loop to checkBottom
+//Subtracts (a lot) from score for triggering "game over"
+//Prohibit ability to place blocks below existing blocks
+
 //THINGS I DON'T NEED ANYMORE: 1. app/models/input.rb (where prev. validators & error message was written); 2. controllers/inputs_controller (where flash notices were written, and form was told to reset or not), 3. views/inputs/create.js.erb (where prev. notices were removed, error & success messages were displayed, pieces array was displayed, and form was reset if needed 
 //NOTE: Pressing "enter" when entering input submits the form, which gives it an action of "post". However, it's not possible to make an actionless form with Rails form helpers. Thus, need to replace form_for tag with plain HTML form tags and ignore the action.
