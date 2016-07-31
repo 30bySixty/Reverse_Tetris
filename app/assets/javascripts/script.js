@@ -394,10 +394,8 @@ function logscore(X) {
 
 $(document).ready(createboard);
 $(document).on('page:load', createboard);
-//STEPS TO IMPROVE ALGO FUNCTIONALITY
-//Add loop to checkBottom
+
+//STEPS TO IMPROVE ALGO FUNCTIONALITY:
+//Add loop to checkBottom function
 //Subtracts (a lot) from score for triggering "game over"
 //Prohibit ability to place blocks below existing blocks
-
-//THINGS I DON'T NEED ANYMORE: 1. app/models/input.rb (where prev. validators & error message was written); 2. controllers/inputs_controller (where flash notices were written, and form was told to reset or not), 3. views/inputs/create.js.erb (where prev. notices were removed, error & success messages were displayed, pieces array was displayed, and form was reset if needed 
-//NOTE: Pressing "enter" when entering input submits the form, which gives it an action of "post". However, it's not possible to make an actionless form with Rails form helpers. Thus, need to replace form_for tag with plain HTML form tags and ignore the action.
