@@ -22,7 +22,7 @@ function orderrows() {
         $(this).attr("id", i);
         i +=1;
     });
-    $('.board').children().children().css("border-top", "1px solid lightslategray");
+    $('.board').children().children().css("border-top", "1px solid white");
     $('.board').children('#1').children().css("border-top", "2px solid red");
 };
 //END SETUP OF GAME BOARD & SCORING

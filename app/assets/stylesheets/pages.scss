@@ -27,9 +27,15 @@
     background-color: gold;
     border: 1px solid goldenrod;
 }
+.boardcontainer {
+    text-align: center;
+}
+.board {
+    display: inline-block;
+}
 .board div div{
-    background-color: lightgray;
-    border: 1px solid lightslategray;
+    background-color: #f0f0f0;
+    border: 1px solid white;
 }
 .pieceB > div, .pieceC > div, .pieceD > div, .pieceE > div, .board > div {
     min-width: 100%;
